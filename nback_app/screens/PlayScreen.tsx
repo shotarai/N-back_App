@@ -7,11 +7,15 @@ import {
   StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import type { StackParamList } from "../App";
+import { type StackParamList } from "../App";
 import { db, auth } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 
-const PlayScreen: React.FC = () => {
+interface PlayScreenProps {
+  currentTime: string;
+}
+
+const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
   const [checkBool, setCheckBool] = useState(true);
   const [canResume, setCanResume] = useState(true);
   const [endUp, setEndUp] = useState(true);
@@ -94,22 +98,9 @@ const PlayScreen: React.FC = () => {
     }
   }, [timeList]);
 
-  const formatDateToCustomString = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-
-    return `${year}/${month}/${day}/${hours}:${minutes}:${seconds}`;
-  };
-
   const SendData = async () => {
-    const currentDate: Date = new Date();
-    const formattedDate = formatDateToCustomString(currentDate);
     const newData = {
-      [formattedDate]: {
+      nback: {
         正解数: correctCount,
         解答数: displayCount - n - 1,
         正答遷移: correctList,
@@ -119,15 +110,15 @@ const PlayScreen: React.FC = () => {
     const currentUserEmail = auth.currentUser?.email
       ? auth.currentUser.email
       : "";
-    const dataRef = doc(db, "2023", currentUserEmail);
+    const dataRef = doc(db, "2024", currentUserEmail);
     await setDoc(
       dataRef,
       {
-        data: newData,
+        [currentTime]: newData,
       },
       { merge: true }
     );
-    navigation.navigate("Login");
+    navigation.navigate("Check");
   };
 
   return (
