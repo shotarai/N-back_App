@@ -29,7 +29,7 @@ const LoginScreen: React.FC = () => {
     onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
         if (user.emailVerified == true) {
-          navigation.navigate("Question");
+          navigation.navigate("Check");
         }
       }
     })
@@ -47,7 +47,7 @@ const LoginScreen: React.FC = () => {
         navigation.navigate("Login");
       } else {
         if (user.emailVerified == true) {
-          navigation.navigate("Question");
+          navigation.navigate("Check");
         } else {
           Alert.alert("メールの認証がされていません");
           navigation.navigate("Login");

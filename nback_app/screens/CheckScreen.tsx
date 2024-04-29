@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { db, auth } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
+import type { StackParamList } from "../App";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 interface CheckScreenProps {
   currentTime: string;
 }
 
 const CheckScreen: React.FC<CheckScreenProps> = ({ currentTime }) => {
-  const [endBool, setEndbool] = useState<boolean>(true);
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  type homeScreenProp = StackNavigationProp<StackParamList>;
+  const navigation = useNavigation<homeScreenProp>();
 
   const saveAnswer = async () => {
     const newData = {
@@ -26,37 +30,30 @@ const CheckScreen: React.FC<CheckScreenProps> = ({ currentTime }) => {
       },
       { merge: true }
     );
-    setEndbool(false);
   };
 
   return (
     <View style={styles.container}>
-      {endBool ? (
-        <View style={styles.container}>
-          <Text style={styles.questionText}>
-            あなたは今日Ouraアプリで睡眠データを確認しないというルールを遵守しましたか？
-          </Text>
-          <TouchableOpacity
-            style={[styles.checkBox, isChecked && styles.checkBoxChecked]}
-            onPress={() => setIsChecked(!isChecked)}
-          >
-            {isChecked && <Text style={styles.checkBoxText}>✓</Text>}
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, { marginTop: 20 }]}
-            onPress={() => {
-              saveAnswer();
-            }}
-          >
-            <Text style={styles.buttonText}>決定</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.container}>
-          <Text style={styles.questionText}>データ送信が完了しました</Text>
-          <Text style={styles.questionText}>アプリを終了してください</Text>
-        </View>
-      )}
+      <View style={styles.container}>
+        <Text style={styles.questionText}>
+          あなたは今日Ouraアプリで睡眠データを確認しないというルールを遵守しましたか？
+        </Text>
+        <TouchableOpacity
+          style={[styles.checkBox, isChecked && styles.checkBoxChecked]}
+          onPress={() => setIsChecked(!isChecked)}
+        >
+          {isChecked && <Text style={styles.checkBoxText}>✓</Text>}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, { marginTop: 20 }]}
+          onPress={() => {
+            saveAnswer();
+            navigation.navigate("Question");
+          }}
+        >
+          <Text style={styles.buttonText}>決定</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

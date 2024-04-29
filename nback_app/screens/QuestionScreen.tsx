@@ -40,11 +40,11 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({ currentTime }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.questionText}>
-        今日の睡眠は昨日の睡眠と比べてよく眠れたと思いますか？
+        昨日のワーキングメモリと比べて今日はどう感じますか？
       </Text>
       {/* ラジオボタン */}
       <View style={styles.buttonContainer}>
-        {["かなりよく眠れた", "よく眠れた", "変わらない", "よく眠れなかった", "かなり眠れなかった"].map((answer) => (
+        {["大幅に良くなっている", "やや良くなっている", "変わらない", "やや悪くなっている", "大幅に悪くなっている"].map((answer) => (
           <TouchableOpacity
             key={answer}
             style={[

@@ -33,6 +33,7 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
 
   type homeScreenProp = StackNavigationProp<StackParamList>;
   const navigation = useNavigation<homeScreenProp>();
+  const [endBool, setEndbool] = useState<boolean>(true);
 
   const RandomAlphabet = () => {
     if (!checkBool || displayCount === all_questions + n + 1) {
@@ -118,97 +119,104 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
       },
       { merge: true }
     );
-    navigation.navigate("Check");
+    setEndbool(false);
   };
 
   return (
     <View style={styles.container}>
-      {endUp ? (
-         checkBool ? (
-          <View style={styles.container}>
-            <Text style={[styles.randomLetter, { marginTop: -80 }]}>
-              {randomLetter}
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.container}>
-            <Text style={styles.text}>{n}つ前のアルファベットは？</Text>
-            <View style={styles.buttonContainer}>
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.button2}
-                  onPress={() => CheckAnswer('A')}
-                >
-                  <Text style={styles.buttonText}>A</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button2}
-                  onPress={() => CheckAnswer('B')}
-                >
-                  <Text style={styles.buttonText}>B</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button2}
-                  onPress={() => CheckAnswer('C')}
-                >
-                  <Text style={styles.buttonText}>C</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.button2}
-                  onPress={() => CheckAnswer('D')}
-                >
-                  <Text style={styles.buttonText}>D</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button2}
-                  onPress={() => CheckAnswer('E')}
-                >
-                  <Text style={styles.buttonText}>E</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button2}
-                  onPress={() => CheckAnswer('F')}
-                >
-                  <Text style={styles.buttonText}>F</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={styles.button2}
-                  onPress={() => CheckAnswer('G')}
-                >
-                  <Text style={styles.buttonText}>G</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button2}
-                  onPress={() => CheckAnswer('H')}
-                >
-                  <Text style={styles.buttonText}>H</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button2}
-                  onPress={() => CheckAnswer('I')}
-                >
-                  <Text style={styles.buttonText}>I</Text>
-                </TouchableOpacity>
+      {endBool ? (
+        endUp ? (
+          checkBool ? (
+            <View style={styles.container}>
+              <Text style={[styles.randomLetter, { marginTop: -80 }]}>
+                {randomLetter}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.container}>
+              <Text style={styles.text}>{n}つ前のアルファベットは？</Text>
+              <View style={styles.buttonContainer}>
+                <View style={styles.row}>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => CheckAnswer('A')}
+                  >
+                    <Text style={styles.buttonText}>A</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => CheckAnswer('B')}
+                  >
+                    <Text style={styles.buttonText}>B</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => CheckAnswer('C')}
+                  >
+                    <Text style={styles.buttonText}>C</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.row}>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => CheckAnswer('D')}
+                  >
+                    <Text style={styles.buttonText}>D</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => CheckAnswer('E')}
+                  >
+                    <Text style={styles.buttonText}>E</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => CheckAnswer('F')}
+                  >
+                    <Text style={styles.buttonText}>F</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.row}>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => CheckAnswer('G')}
+                  >
+                    <Text style={styles.buttonText}>G</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => CheckAnswer('H')}
+                  >
+                    <Text style={styles.buttonText}>H</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button2}
+                    onPress={() => CheckAnswer('I')}
+                  >
+                    <Text style={styles.buttonText}>I</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
+          )
+        ) : (
+          <View style={styles.container}>
+            <Text style={styles.text}>結果</Text>
+            <Text style={styles.text}>
+              {correctCount}/{displayCount - n - 1}
+            </Text>
+            <TouchableOpacity
+              style={[styles.button, { marginTop: 50 }]}
+              onPress={() => SendData()}
+            >
+              <Text style={styles.buttonText}>OK</Text>
+            </TouchableOpacity>
           </View>
         )
       ) : (
         <View style={styles.container}>
-          <Text style={styles.text}>結果</Text>
-          <Text style={styles.text}>
-            {correctCount}/{displayCount - n - 1}
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, { marginTop: 50 }]}
-            onPress={() => SendData()}
-          >
-            <Text style={styles.buttonText}>OK</Text>
-          </TouchableOpacity>
+          <Text style={styles.questionText}>データ送信が完了しました</Text>
+          <Text style={styles.questionText}>アプリを終了してください</Text>
         </View>
       )}
     </View>
@@ -220,6 +228,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  questionText: {
+    fontSize: 24,
+    marginBottom: 20,
+    textAlign: "center",
   },
   button: {
     backgroundColor: "blue",
