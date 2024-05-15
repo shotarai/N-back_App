@@ -201,10 +201,11 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
           )
         ) : (
           <View style={styles.container}>
-            <Text style={styles.text}>結果</Text>
+            <Text style={styles.text}>測定終了</Text>
+            {/* <Text style={styles.text}>結果</Text>
             <Text style={styles.text}>
               {correctCount}/{displayCount - n - 1}
-            </Text>
+            </Text>*/}
             <TouchableOpacity
               style={[styles.button, { marginTop: 50 }]}
               onPress={() => SendData()}
