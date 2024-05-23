@@ -11,10 +11,12 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import type { StackParamList } from "../App";
 import { auth } from "../firebase";
+import { useLanguage } from '../contexts/LanguageContext';
 
 const StartScreen: React.FC = () => {
     type homeScreenProp = StackNavigationProp<StackParamList>;
     const navigation = useNavigation<homeScreenProp>();
+    const { language } = useLanguage();
   
     // ログアウトボタンが押されたときの処理
     const handleLogout = async () => {
@@ -28,10 +30,21 @@ const StartScreen: React.FC = () => {
     return (
       <View style={styles.container}>
         <View style={styles.container}>
-          <Text style={styles.text}>{auth.currentUser?.email}さん</Text>
-          <Text style={[styles.text, { marginBottom: 50 }]}>
-            今日も頑張りましょう！
-          </Text>
+          {language === 'ja' ? (
+            <>
+              <Text style={styles.text}>{auth.currentUser?.email}さん</Text>
+              <Text style={[styles.text, { marginBottom: 50 }]}>
+                今日も頑張りましょう！
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.text}>{auth.currentUser?.email}</Text>
+              <Text style={[styles.text, { marginBottom: 50 }]}>
+                Keep up the good work today!
+              </Text>
+            </>
+          )}
           <TouchableOpacity
             style={[styles.button, { marginBottom: 50 }]}
             onPress={() => navigation.navigate("Play")}
@@ -39,7 +52,7 @@ const StartScreen: React.FC = () => {
             <Text style={styles.buttonText}>Start</Text>
           </TouchableOpacity>
           <Button
-            title="ログアウト→"
+            title= {language === 'ja' ? ("ログアウト→") : ("Logout→")} 
             onPress={() => {
               handleLogout();
               navigation.navigate("Login");

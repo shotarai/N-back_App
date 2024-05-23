@@ -5,6 +5,7 @@ import { db, auth } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { StackParamList} from "../App";
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface QuestionScreenProps {
   currentTime: string;
@@ -13,6 +14,12 @@ interface QuestionScreenProps {
 const QuestionScreen: React.FC<QuestionScreenProps> = ({ currentTime }) => {
   type homeScreenProp = StackNavigationProp<StackParamList>;
   const navigation = useNavigation<homeScreenProp>();
+  const { language } = useLanguage();
+
+  //選択肢
+  const answers = language === 'ja'
+    ? ["大幅に良くなっている", "やや良くなっている", "変わらない", "やや悪くなっている", "大幅に悪くなっている"]
+    : ["much better", "better", "no change", "worse", "much worse"];
 
   // ラジオボタンの選択状態を管理するstate
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -39,12 +46,18 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({ currentTime }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.questionText}>
-        昨日のワーキングメモリと比べて今日はどう感じますか？
-      </Text>
+      {language === 'ja' ? (
+        <Text style={styles.questionText}>
+          昨日のワーキングメモリと比べて今日はどう感じますか？
+        </Text>
+      ) : (
+        <Text style={styles.questionText}>
+          How do you feel your working memory is compared to yesterday?
+        </Text>
+      )}
       {/* ラジオボタン */}
       <View style={styles.buttonContainer}>
-        {["大幅に良くなっている", "やや良くなっている", "変わらない", "やや悪くなっている", "大幅に悪くなっている"].map((answer) => (
+        {answers.map((answer) => (
           <TouchableOpacity
             key={answer}
             style={[
@@ -65,7 +78,11 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({ currentTime }) => {
           navigation.navigate("Start");
         }}
       >
-        <Text style={styles.comfirmButtonText}>決定</Text>
+        {language === 'ja' ? (
+          <Text style={styles.comfirmButtonText}>決定</Text>
+        ) : (
+          <Text style={styles.comfirmButtonText}>Decide</Text>
+        )}
       </TouchableOpacity>
     </View>
   );

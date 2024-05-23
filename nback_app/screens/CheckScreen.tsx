@@ -5,6 +5,7 @@ import { doc, setDoc } from "firebase/firestore";
 import type { StackParamList } from "../App";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface CheckScreenProps {
   currentTime: string;
@@ -14,6 +15,7 @@ const CheckScreen: React.FC<CheckScreenProps> = ({ currentTime }) => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
   type homeScreenProp = StackNavigationProp<StackParamList>;
   const navigation = useNavigation<homeScreenProp>();
+  const { language } = useLanguage();
 
   const saveAnswer = async () => {
     const newData = {
@@ -35,9 +37,15 @@ const CheckScreen: React.FC<CheckScreenProps> = ({ currentTime }) => {
   return (
     <View style={styles.container}>
       <View style={styles.container}>
-        <Text style={styles.questionText}>
-          あなたは今日Ouraアプリで睡眠データを確認しないというルールを遵守しましたか？
-        </Text>
+        {language === 'ja' ? (
+          <Text style={styles.questionText}>
+            あなたは今日Ouraアプリで睡眠データを確認しないというルールを遵守しましたか？
+          </Text>
+        ) : (
+          <Text style={styles.questionText}>
+            Please make sure that you haven't checked todays Oura data yet?
+          </Text>
+        )}
         <TouchableOpacity
           style={[styles.checkBox, isChecked && styles.checkBoxChecked]}
           onPress={() => setIsChecked(!isChecked)}
@@ -51,7 +59,11 @@ const CheckScreen: React.FC<CheckScreenProps> = ({ currentTime }) => {
             navigation.navigate("Question");
           }}
         >
-          <Text style={styles.buttonText}>決定</Text>
+          {language === 'ja' ? (
+            <Text style={styles.buttonText}>決定</Text>
+          ) : (
+            <Text style={styles.buttonText}>Decide</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

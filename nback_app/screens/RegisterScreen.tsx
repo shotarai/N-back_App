@@ -13,10 +13,12 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "../firebase";
+import { useLanguage } from '../contexts/LanguageContext';
 
 const RegisterScreen: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { language } = useLanguage();
 
   const handleRegister = async () => {
     try {
@@ -77,13 +79,13 @@ const RegisterScreen: React.FC = () => {
 
   const registerButton = (
     <TouchableOpacity style={styles.button} onPress={handleRegister}>
-      <Text style={styles.text}>登録する</Text>
+      <Text style={styles.text}>{language === 'ja' ? '登録する' : 'Register'}</Text>
     </TouchableOpacity>
   );
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
-      <Text style={styles.heading}>ユーザー登録</Text>
+      <Text style={styles.heading}>{language === 'ja' ? 'ユーザー登録' : 'User Registration'}</Text>
       {inputEmail}
       {inputPassword}
       {registerButton}

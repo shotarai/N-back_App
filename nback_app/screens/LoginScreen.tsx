@@ -18,10 +18,12 @@ import {
 import type { StackParamList } from "../App";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useLanguage } from '../contexts/LanguageContext';
 
 const LoginScreen: React.FC = () => {
   type homeScreenProp = StackNavigationProp<StackParamList>;
   const navigation = useNavigation<homeScreenProp>();
+  const { language } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -29,7 +31,7 @@ const LoginScreen: React.FC = () => {
     onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
         if (user.emailVerified == true) {
-          navigation.navigate("Check");
+          navigation.navigate("Language");
         }
       }
     })
@@ -39,17 +41,29 @@ const LoginScreen: React.FC = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      Alert.alert("メールアドレスまたはパスワードが間違っています！");
+      Alert.alert(
+        language === 'ja'
+          ? "メールアドレスまたはパスワードが間違っています！"
+          : "The email address or password is incorrect!"
+      );
     }
     onAuthStateChanged(auth, (user: User | null) => {
       if (!user) {
-        Alert.alert("ユーザーが存在しません");
+        Alert.alert(
+          language === 'ja'
+            ? "ユーザーが存在しません"
+            : "User does not exist"
+        );
         navigation.navigate("Login");
       } else {
         if (user.emailVerified == true) {
-          navigation.navigate("Check");
+          navigation.navigate("Language");
         } else {
-          Alert.alert("メールの認証がされていません");
+          Alert.alert(
+            language === 'ja'
+              ? "メールの認証がされていません"
+              : "Email is not verified"
+          );
           navigation.navigate("Login");
         }
       }
@@ -58,7 +72,7 @@ const LoginScreen: React.FC = () => {
 
   return (
     <KeyboardAvoidingView style={styles.container}>
-      <Text style={styles.heading}>ログイン</Text>
+      <Text style={styles.heading}>{language === 'ja' ? 'ログイン' : 'Login'}</Text>
       <View>
         <TextInput
           style={styles.input}
@@ -74,10 +88,10 @@ const LoginScreen: React.FC = () => {
           secureTextEntry
         />
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.text}>ログイン</Text>
+          <Text style={styles.text}>{language === 'ja' ? 'ログイン' : 'Login'}</Text>
         </TouchableOpacity>
         <Button
-          title="新規登録はこちら→"
+          title={language === 'ja' ? '新規登録はこちら→' : 'Click here to register→'}
           onPress={() => {
             navigation.navigate("Register");
           }}

@@ -10,6 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import { type StackParamList } from "../App";
 import { db, auth } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface PlayScreenProps {
   currentTime: string;
@@ -26,6 +27,7 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
   const [displayCount, setDisplayCount] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [startTime, setStartTime] = useState(0);
+  const { language } = useLanguage();
   const n = 3;
   const all_questions = 20;
   // const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -134,7 +136,7 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
             </View>
           ) : (
             <View style={styles.container}>
-              <Text style={styles.text}>{n}つ前のアルファベットは？</Text>
+              <Text style={styles.text}>{language === 'ja'? `${n}つ前のアルファベットは？`: `What is the ${n}th previous letter of the alphabet?`}</Text>
               <View style={styles.buttonContainer}>
                 <View style={styles.row}>
                   <TouchableOpacity
@@ -201,7 +203,7 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
           )
         ) : (
           <View style={styles.container}>
-            <Text style={styles.text}>測定終了</Text>
+            <Text style={styles.text}>{language === 'ja' ? '測定終了' : 'Finish'}</Text>
             {/* <Text style={styles.text}>結果</Text>
             <Text style={styles.text}>
               {correctCount}/{displayCount - n - 1}
@@ -216,8 +218,8 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
         )
       ) : (
         <View style={styles.container}>
-          <Text style={styles.questionText}>データ送信が完了しました</Text>
-          <Text style={styles.questionText}>アプリを終了してください</Text>
+          <Text style={styles.questionText}>{language === 'ja' ? 'データ送信が完了しました' : 'Complete Sending Data'}</Text>
+          <Text style={styles.questionText}>{language === 'ja' ? 'アプリを終了してください' : 'Please close the app'}</Text>
         </View>
       )}
     </View>
