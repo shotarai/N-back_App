@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { db, auth } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { StackParamList} from "../App";
+import { StackParamList } from "../App";
 import { useLanguage } from '../contexts/LanguageContext';
+import { useRadioContext } from '../contexts/RadioContext';
 
 interface QuestionScreenProps {
   currentTime: string;
@@ -15,6 +14,7 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({ currentTime }) => {
   type homeScreenProp = StackNavigationProp<StackParamList>;
   const navigation = useNavigation<homeScreenProp>();
   const { language } = useLanguage();
+  const { setSleepAnswer } = useRadioContext();
 
   //選択肢
   const answers = language === 'ja'
@@ -24,35 +24,15 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({ currentTime }) => {
   // ラジオボタンの選択状態を管理するstate
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 
-  // 回答を保存する関数
-  const saveAnswer = async () => {
-    const newData = {
-      question: {
-        解答: selectedAnswer,
-      },
-    };
-    const currentUserEmail = auth.currentUser?.email
-      ? auth.currentUser.email
-      : "";
-    const dataRef = doc(db, "2024", currentUserEmail);
-    await setDoc(
-      dataRef,
-      {
-        [currentTime]: newData,
-      },
-      { merge: true }
-    );
-  };
-
   return (
     <View style={styles.container}>
       {language === 'ja' ? (
         <Text style={styles.questionText}>
-          昨日のワーキングメモリと比べて今日はどう感じますか？
+          昨日と比べて、今日の睡眠の質はどうでしたか？
         </Text>
       ) : (
         <Text style={styles.questionText}>
-          How do you feel your working memory is compared to yesterday?
+          Compared to yesterday, how was the quality of your sleep today
         </Text>
       )}
       {/* ラジオボタン */}
@@ -72,16 +52,23 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({ currentTime }) => {
         ))}
       </View>
       <TouchableOpacity
-        style={[styles.comfirmButton, { marginTop: 20 }]}
+        style={[
+          styles.confirmButton,
+          { marginTop: 20 },
+          !selectedAnswer && styles.confirmButtonDisabled,
+        ]}
         onPress={() => {
-          saveAnswer();
-          navigation.navigate("Start");
+          if (selectedAnswer) {
+            setSleepAnswer(selectedAnswer)
+            navigation.navigate("Start");
+          }
         }}
+        disabled={!selectedAnswer}
       >
         {language === 'ja' ? (
-          <Text style={styles.comfirmButtonText}>決定</Text>
+          <Text style={styles.confirmButtonText}>決定</Text>
         ) : (
-          <Text style={styles.comfirmButtonText}>Decide</Text>
+          <Text style={styles.confirmButtonText}>Decide</Text>
         )}
       </TouchableOpacity>
     </View>
@@ -113,7 +100,7 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderRadius: 20,
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 30,
     marginVertical: 5,
   },
   buttonSelected: {
@@ -131,15 +118,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
   },
-  comfirmButton: {
+  confirmButton: {
     backgroundColor: "blue",
     paddingVertical: 20,
     paddingHorizontal: 40,
     borderRadius: 10,
   },
-  comfirmButtonText: {
-    color: "white",
-    fontSize: 24,
+  confirmButtonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  confirmButtonText: {
+    color: "#fff",
+    fontSize: 16,
   },
 });
 

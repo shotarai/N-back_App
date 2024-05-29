@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { LanguageProvider } from './contexts/LanguageContext';
+import { RadioProvider } from './contexts/RadioContext';
+import { CheckProvider } from "./contexts/CheckContext";
 import { Text, View } from "react-native";
 import QuestionScreen from "./screens/QuestionScreen";
 import CheckScreen from "./screens/CheckScreen";
@@ -60,62 +62,66 @@ export default function App() {
   } else {
     return (
       <LanguageProvider>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName={"Login"}>
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{
-                headerBackVisible: false,
-                gestureEnabled: false,
-              }}
-            />
-            <Stack.Screen
-              name="Language"
-              component={LanguageScreen}
-              options={{
-                headerBackVisible: false,
-                gestureEnabled: false,
-              }}
-            />
-            <Stack.Screen
-              name="Question"
-              options={{
-                headerBackVisible: false,
-                gestureEnabled: false,
-              }}
-            >
-              {() => <QuestionScreen currentTime={currentTime} />}
-            </Stack.Screen>
-            <Stack.Screen
-              name="Start"
-              component={StartScreen}
-              options={{
-                headerBackVisible: false,
-                gestureEnabled: false,
-              }}
-            />
-            <Stack.Screen
-              name="Play"
-              options={{
-                headerBackVisible: false,
-                gestureEnabled: false,
-              }}
-            >
-              {() => <PlayScreen currentTime={currentTime} />}
-            </Stack.Screen>
-            <Stack.Screen
-              name="Check"
-              options={{
-                headerBackVisible: false,
-                gestureEnabled: false,
-              }}
-            >
-              {() => <CheckScreen currentTime={currentTime} />}
-            </Stack.Screen>
-            <Stack.Screen name="Register" component={RegisterScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <CheckProvider>
+          <RadioProvider>
+            <NavigationContainer>
+              <Stack.Navigator initialRouteName={"Login"}>
+                <Stack.Screen
+                  name="Login"
+                  component={LoginScreen}
+                  options={{
+                    headerBackVisible: false,
+                    gestureEnabled: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="Language"
+                  component={LanguageScreen}
+                  options={{
+                    headerBackVisible: false,
+                    gestureEnabled: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="Question"
+                  options={{
+                    headerBackVisible: false,
+                    gestureEnabled: false,
+                  }}
+                >
+                  {() => <QuestionScreen currentTime={currentTime} />}
+                </Stack.Screen>
+                <Stack.Screen
+                  name="Start"
+                  component={StartScreen}
+                  options={{
+                    headerBackVisible: false,
+                    gestureEnabled: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="Play"
+                  options={{
+                    headerBackVisible: false,
+                    gestureEnabled: false,
+                  }}
+                >
+                  {() => <PlayScreen currentTime={currentTime} />}
+                </Stack.Screen>
+                <Stack.Screen
+                  name="Check"
+                  options={{
+                    headerBackVisible: false,
+                    gestureEnabled: false,
+                  }}
+                >
+                  {() => <CheckScreen currentTime={currentTime} />}
+                </Stack.Screen>
+                <Stack.Screen name="Register" component={RegisterScreen} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </RadioProvider>
+        </CheckProvider>
       </LanguageProvider>
     );
   }

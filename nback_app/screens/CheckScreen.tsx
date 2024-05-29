@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { db, auth } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
 import type { StackParamList } from "../App";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useLanguage } from '../contexts/LanguageContext';
+import { useCheckContext } from '../contexts/CheckContext';
 
 interface CheckScreenProps {
   currentTime: string;
@@ -16,23 +15,7 @@ const CheckScreen: React.FC<CheckScreenProps> = ({ currentTime }) => {
   type homeScreenProp = StackNavigationProp<StackParamList>;
   const navigation = useNavigation<homeScreenProp>();
   const { language } = useLanguage();
-
-  const saveAnswer = async () => {
-    const newData = {
-      checkbox: {
-        ルールを遵守: isChecked ? "ルールを厳守している" : "ルールを破ってしまった",
-      },
-    };
-    const currentUserEmail = auth.currentUser?.email ? auth.currentUser.email : "";
-    const dataRef = doc(db, "2024", currentUserEmail);
-    await setDoc(
-      dataRef,
-      {
-        [currentTime]: newData,
-      },
-      { merge: true }
-    );
-  };
+  const { setIsCheckedBool } = useCheckContext();
 
   return (
     <View style={styles.container}>
@@ -55,7 +38,7 @@ const CheckScreen: React.FC<CheckScreenProps> = ({ currentTime }) => {
         <TouchableOpacity
           style={[styles.button, { marginTop: 20 }]}
           onPress={() => {
-            saveAnswer();
+            setIsCheckedBool(isChecked);
             navigation.navigate("Question");
           }}
         >

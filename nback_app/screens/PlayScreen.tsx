@@ -11,6 +11,9 @@ import { type StackParamList } from "../App";
 import { db, auth } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { useLanguage } from '../contexts/LanguageContext';
+import AnswerButton from "../components/AnswerButton";
+import { useCheckContext } from '../contexts/CheckContext';
+import { useRadioContext } from '../contexts/RadioContext';
 
 interface PlayScreenProps {
   currentTime: string;
@@ -28,6 +31,8 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
   const [correctCount, setCorrectCount] = useState(0);
   const [startTime, setStartTime] = useState(0);
   const { language } = useLanguage();
+  const { isCheckedBool } = useCheckContext();
+  const { sleepAnswer } = useRadioContext();
   const n = 3;
   const all_questions = 20;
   // const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -103,6 +108,12 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
 
   const SendData = async () => {
     const newData = {
+      checkbox: {
+        ルールを遵守: isCheckedBool ? "ルールを厳守している" : "ルールを破ってしまった",
+      },
+      question: {
+        解答: sleepAnswer,
+      },
       nback: {
         正解数: correctCount,
         解答数: displayCount - n - 1,
@@ -114,13 +125,24 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
       ? auth.currentUser.email
       : "";
     const dataRef = doc(db, "2024", currentUserEmail);
-    await setDoc(
-      dataRef,
-      {
-        [currentTime]: newData,
-      },
-      { merge: true }
-    );
+    const maxRetries = 3;
+    let attempts = 0;
+    let success = false;
+  
+    while (attempts < maxRetries && !success) {
+      try {
+        await setDoc(dataRef, { [currentTime]: newData }, { merge: true });
+        success = true;
+      } catch (error) {
+        attempts += 1;
+        if (attempts >= maxRetries) {
+          console.error("Failed to save answer after multiple attempts:", error);
+          // ユーザーにエラーメッセージを表示するなどの追加処理を実装
+        } else {
+          console.log(`Retrying to save answer... (Attempt ${attempts})`);
+        }
+      }
+    }
     setEndbool(false);
   };
 
@@ -137,66 +159,22 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
           ) : (
             <View style={styles.container}>
               <Text style={styles.text}>{language === 'ja'? `${n}つ前のアルファベットは？`: `What is the ${n}th previous letter of the alphabet?`}</Text>
+              <Text style={[styles.text, { marginTop: 10 }]}>{displayCount - n - 1}/{all_questions}</Text>
               <View style={styles.buttonContainer}>
                 <View style={styles.row}>
-                  <TouchableOpacity
-                    style={styles.button2}
-                    onPress={() => CheckAnswer('A')}
-                  >
-                    <Text style={styles.buttonText}>A</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button2}
-                    onPress={() => CheckAnswer('B')}
-                  >
-                    <Text style={styles.buttonText}>B</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button2}
-                    onPress={() => CheckAnswer('C')}
-                  >
-                    <Text style={styles.buttonText}>C</Text>
-                  </TouchableOpacity>
+                  {['A', 'B', 'C'].map((label) => (
+                    <AnswerButton key={label} label={label} onPress={() => CheckAnswer(label)} />
+                  ))}
                 </View>
                 <View style={styles.row}>
-                  <TouchableOpacity
-                    style={styles.button2}
-                    onPress={() => CheckAnswer('D')}
-                  >
-                    <Text style={styles.buttonText}>D</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button2}
-                    onPress={() => CheckAnswer('E')}
-                  >
-                    <Text style={styles.buttonText}>E</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button2}
-                    onPress={() => CheckAnswer('F')}
-                  >
-                    <Text style={styles.buttonText}>F</Text>
-                  </TouchableOpacity>
+                  {['D', 'E', 'F'].map((label) => (
+                    <AnswerButton key={label} label={label} onPress={() => CheckAnswer(label)} />
+                  ))}
                 </View>
                 <View style={styles.row}>
-                  <TouchableOpacity
-                    style={styles.button2}
-                    onPress={() => CheckAnswer('G')}
-                  >
-                    <Text style={styles.buttonText}>G</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button2}
-                    onPress={() => CheckAnswer('H')}
-                  >
-                    <Text style={styles.buttonText}>H</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button2}
-                    onPress={() => CheckAnswer('I')}
-                  >
-                    <Text style={styles.buttonText}>I</Text>
-                  </TouchableOpacity>
+                  {['G', 'H', 'I'].map((label) => (
+                    <AnswerButton key={label} label={label} onPress={() => CheckAnswer(label)} />
+                  ))}
                 </View>
               </View>
             </View>
