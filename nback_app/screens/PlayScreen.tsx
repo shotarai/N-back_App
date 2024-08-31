@@ -5,8 +5,8 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator, 
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { type StackParamList } from "../App";
 import { db, auth } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
@@ -24,12 +24,15 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
   const [canResume, setCanResume] = useState(true);
   const [endUp, setEndUp] = useState(true);
   const [timeList, setTimeList] = useState<number[]>([]);
+  const [displayLetters, setDisplayLetters] = useState<string[]>([]);
+  const [answerLetters, setAnswerLetters] = useState<string[]>([]);
   const [correctList, setCorrectList] = useState<number[]>([]);
   const [letterList, setLetterList] = useState<string[]>(["", "", ""]);
   const [randomLetter, setRandomLetter] = useState("");
   const [displayCount, setDisplayCount] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [startTime, setStartTime] = useState(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { language } = useLanguage();
   const { isCheckedBool } = useCheckContext();
   const { sleepAnswer } = useRadioContext();
@@ -39,8 +42,8 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
   const alphabet = "ABCDEFGHI";
 
   type homeScreenProp = StackNavigationProp<StackParamList>;
-  const navigation = useNavigation<homeScreenProp>();
   const [endBool, setEndbool] = useState<boolean>(true);
+
 
   const RandomAlphabet = () => {
     if (!checkBool || displayCount === all_questions + n + 1) {
@@ -52,6 +55,7 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
       const updatedList = [...prevList, randomLetter].slice(-(n+1));
       return updatedList;
     });
+    setDisplayLetters((prevList) => [...prevList, randomLetter]);
     setDisplayCount(displayCount + 1);
     if (displayCount <= n) {
       setTimeout(() => {
@@ -74,6 +78,7 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
     }else{
       setCorrectList((prevList) => [...prevList, 0])
     }
+    setAnswerLetters((prevList) => [...prevList, str]);
     setCheckBool(true);
     setCanResume(true);
     setTimeList((prevList) => [...prevList, timeDifference]);
@@ -107,6 +112,7 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
   }, [timeList]);
 
   const SendData = async () => {
+    setEndbool(false);
     const newData = {
       checkbox: {
         ルールを遵守: isCheckedBool ? "ルールを厳守している" : "ルールを破ってしまった",
@@ -117,6 +123,8 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
       nback: {
         正解数: correctCount,
         解答数: displayCount - n - 1,
+        表示アルファベット: displayLetters.slice(1, 21),
+        解答アルファベット: answerLetters,
         正答遷移: correctList,
         解答時間: timeList,
       },
@@ -143,7 +151,7 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
         }
       }
     }
-    setEndbool(false);
+    setIsLoading(false);
   };
 
   return (
@@ -190,14 +198,20 @@ const PlayScreen: React.FC<PlayScreenProps> = ({ currentTime }) => {
               style={[styles.button, { marginTop: 50 }]}
               onPress={() => SendData()}
             >
-              <Text style={styles.buttonText}>OK</Text>
+              <Text style={styles.buttonText}>{language === 'ja' ? '送信' : 'Send'}</Text>
             </TouchableOpacity>
           </View>
         )
       ) : (
         <View style={styles.container}>
-          <Text style={styles.questionText}>{language === 'ja' ? 'データ送信が完了しました' : 'Complete Sending Data'}</Text>
-          <Text style={styles.questionText}>{language === 'ja' ? 'アプリを終了してください' : 'Please close the app'}</Text>
+          {isLoading ? ( // Conditionally render the loading indicator
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <>
+              <Text style={styles.questionText}>{language === 'ja' ? 'データ送信が完了しました' : 'Complete Sending Data'}</Text>
+              <Text style={styles.questionText}>{language === 'ja' ? 'アプリを終了してください' : 'Please close the app'}</Text>
+            </>
+          )}
         </View>
       )}
     </View>
